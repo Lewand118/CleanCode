@@ -1,0 +1,1 @@
+Example of refactoring sample code (with code smells) for calculating taxes - Java and Python
