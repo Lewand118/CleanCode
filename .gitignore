@@ -1,7 +1,7 @@
 *
 !README.md
 !/CodeSmells
-!/RefactoredCode/Java
-!/RefactoredCode/Python
+!/RefactoredCode/Java/*
+!/RefactoredCode/Python/*
 !*.py
 !*.java
