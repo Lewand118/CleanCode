@@ -1,1 +1,12 @@
-.*
+*
+
+!README.md
+!.gitignore
+
+!CodeSmells/
+!RefactoredCode/
+!RefactoredCode/Python/
+!RefactoredCode/Java/
+
+!*.py
+!*.java

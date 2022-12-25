@@ -1,10 +1,10 @@
 from TaxCalculator import TaxCalculator
 
 def main():
-    taxObj = TaxCalculator()
-    taxObj.get_input()
+    tax_calc = TaxCalculator()
     
-    taxObj.print_all_taxes()
+    tax_calc.get_input()
+    tax_calc.print_all_taxes()
 
 
 if __name__ == '__main__':

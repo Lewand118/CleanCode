@@ -1,5 +1,4 @@
 import re
-from math import ceil
 
 class TaxCalculator(object):
     """
@@ -7,8 +6,8 @@ class TaxCalculator(object):
     Depending on the context, the current methods could be written differently.
     However, the goal was only to eliminate CodeSmells in a single class and to provide generic approach to allow extensions in different directions
     """
-    def __init__(self, social_security_rate=0.0976, social_security_health_rate=0.015, social_security_sickness_rate=0.0245,
-                    deductible_expenses_rate=111.25, advance_rate_rate=0.18, reduced_tax_rate=46.33, health_lower_rate=0.0775, health_higher_rate=0.09) -> None:
+    def __init__(self, social_security_rate=0.0976, social_security_health_rate=0.015, social_security_sickness_rate=0.0245, deductible_expenses_rate=111.25,
+                deductible_expenses_rate_civil=0.2, advance_rate_rate=0.18, reduced_tax_rate=46.33, health_lower_rate=0.0775, health_higher_rate=0.09) -> None:
         self.income = None
         self.type = None
         self.social_security_rate = social_security_rate
@@ -16,13 +15,10 @@ class TaxCalculator(object):
         self.social_security_sickness_rate = social_security_sickness_rate
     
         self.deductible_expenses_rate = deductible_expenses_rate
+        self.deductible_expenses_rate_civil = deductible_expenses_rate_civil
         self.health = {'lower': health_lower_rate, 'higher': health_higher_rate}
         self.advance_rate = advance_rate_rate
         self.reduced_tax_rate = reduced_tax_rate
-        self.advance_tax = 0
-
-    def print_rates(self):
-        pass
 
     def get_input(self):
         try:
@@ -54,7 +50,7 @@ class TaxCalculator(object):
         social_security_health = self.round_tax(income*self.social_security_health_rate)
         social_security_sickness = self.round_tax(income*self.social_security_sickness_rate)
         all_social_taxes = sum([social_security,social_security_health,social_security_sickness])
-        print(f'social: {all_social_taxes}')
+
         return {'social_security': social_security, 'social_security_health': social_security_health, 'social_security_sickness': social_security_sickness, 'sum': all_social_taxes}
 
     def health_security_tax(self, income, is_base=False):
@@ -64,44 +60,48 @@ class TaxCalculator(object):
 
         return {'health_tax_lower': health_tax_lower, 'health_tax_higher': health_tax_higher}
 
-    def advance_tax(self, income):
-        print(f'advance: {income}')
-        return self.round_tax(income*(self.advance_rate))
+    def advance_tax(self, income_base):
+        income_base = self.round_tax(income_base)
+        advanced = self.round_tax(income_base*self.advance_rate)
+        return advanced
 
-    def reduce_tax(self, income):
-        reduced = self.advance_tax(income) - self.reduced_tax_rate
+    def reduce_tax(self, income_base):
+        reduced = self.advance_tax(income_base)-self.reduced_tax_rate# if self.type == 'E' else self.advance_tax(income_base)
         return reduced
 
-    def calculate_net_income(self):
+    def calculate_net_income(self, deductible_expenses):
         social_taxes = self.social_security_taxes(self.income)['sum']
         health_tax = self.health_security_tax(self.income)['health_tax_lower']
-        advance = 0#advance(self.income)
+        advance = self.advance_tax(self.income-social_taxes-deductible_expenses)
         net_income = self.income - social_taxes - health_tax - advance
 
-        return net_income
+        return self.round_tax(net_income)
 
     def print_all_taxes(self):
         social_taxes = self.social_security_taxes(self.income)
         income_base = self.round_tax(self.income-social_taxes['sum'])
         health_tax = self.health_security_tax(income_base, is_base=True)
-        advanced = 0#self.advance_tax(self.income)
-        reduced = 0#self.reduce_tax(self.income)
+        deductible_expenses = self.deductible_expenses_rate if self.type == 'E' else income_base*self.deductible_expenses_rate_civil
+        deductible_expenses = self.round_tax(deductible_expenses)
+        advanced = self.advance_tax(income_base-deductible_expenses)
+        reduced = self.reduce_tax(advanced)
         adnance_paid = advanced - health_tax['health_tax_lower'] - reduced
-        taxed_income = self.round_tax(self.income-social_taxes['sum']-self.deductible_expenses_rate)
-        net_income = self.calculate_net_income()
+        adnance_paid = self.round_tax(adnance_paid)
+        taxed_income = self.round_tax(self.income-social_taxes['sum']-deductible_expenses)
+        net_income = self.calculate_net_income(deductible_expenses)
+
+        type_dependent_text = f'\nTax free income = {self.reduced_tax_rate}' if self.type == 'E' else ''
 
         print(f'''Income: {self.income}\n
-                Social security tax: {self.social_security_rate*100}%\n
-                Health social security tax: {self.social_security_health_rate*100}%\n
-                Sickness social security tax: {self.social_security_sickness_rate*100}%\n
-                Income basis for health social security: {income_base}\n
-                Health social security tax: {self.health['higher']*100}% = {health_tax['health_tax_higher']} {self.health['lower']*100}% = {health_tax['health_tax_lower']}\n
-                Tax deductible expenses: {self.deductible_expenses_rate}\n
-                Income: {taxed_income}  rounded {ceil(taxed_income)}\n
-                Advance tax: {self.advance_rate*100}% = {advanced}\n
-                Tax free income = {self.reduced_tax_rate}\n
-                Reduced tax = {reduced}\n
-                Advance paid tax = {adnance_paid} rounded {ceil(adnance_paid)}\n
-                
+                Social security tax: {self.social_security_rate*100}%
+                Health social security tax: {self.social_security_health_rate*100}%
+                Sickness social security tax: {self.social_security_sickness_rate*100}%
+                Income basis for health social security: {income_base}
+                Health social security tax: {self.health['higher']*100}% = {health_tax['health_tax_higher']} {self.health['lower']*100}% = {health_tax['health_tax_lower']}
+                Tax deductible expenses: {deductible_expenses}
+                Income to be taxed: {taxed_income}  rounded: {round(taxed_income)}
+                Advance tax: {self.advance_rate*100}% = {advanced} {type_dependent_text}
+                Reduced tax (already paid) = {reduced}
+                Advance paid tax = {adnance_paid} rounded: {round(adnance_paid)}\n
                 Net income = {net_income}'''
             )
