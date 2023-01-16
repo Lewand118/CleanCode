@@ -1,32 +1,32 @@
 public class TaxCalculator {
+    private taxRates;
     public TaxCalculator(){
-        
+        taxRates = new TaxRates()
     }
 
 	public static double calculateAdvanceTax(double income) {
-		return (income * 18) / 100;
+		return income * taxRates.getAdvanceTaxRate();
 	}
 
 	public static double calculateSocialSecurityTax(double income) {
-		return (income * 9.76) / 100;
+		return income * taxRates.getSocialTaxRate();
 	}
     public static double calculateHealthSocialSecurityTax(double income) {
-		return (income * 1.5) / 100;
+		return income * taxRates.getHealthTaxRate();
 	}
     public static double calculateSicknessSocialSecurityTax(double income){
-        return (income * 1.5) / 100;
-
+        return income * taxRates.getSicknessTaxRate();
     }
 
 	public static double[] calculateOtherHealthTaxes(double income) {
 		double[] healthTaxes=new double[2];
-        healthTaxes[0] = (income * 9) / 100;
-		healthTaxes[1] = (income * 7.75) / 100;
+        healthTaxes[0] = income * taxRates.getFirstHealthTaxRate();
+		healthTaxes[1] = income * taxRates.getSecondHealthTaxRate();
         return healthTaxes;
 	}
 
     public static double calculateTaxDeductibleExpenses(Double income) {
-        return (income*20)/100;
+        return income * taxRates.getDeducitableTaxRate();
     }
 
     public static double calculateTaxedIncome(Double income,double taxDeductibleExpenses ) {

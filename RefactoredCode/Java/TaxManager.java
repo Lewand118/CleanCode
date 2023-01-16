@@ -1,4 +1,3 @@
-
 public class TaxManager {
     Double income;
     char contractType;
@@ -20,8 +19,8 @@ public class TaxManager {
 
 
         double[] healthTaxes=TaxCalculator.calculateOtherHealthTaxes(income);
-        double taxDeductibleExpenses = TaxCalculator.calculateTaxDeductibleExpenses(income);
-        double taxedIncome= TaxCalculator.calculateTaxedIncome(income, taxDeductibleExpenses);
+        double taxDeductibleExpenses=TaxCalculator.calculateTaxDeductibleExpenses(income);
+        double taxedIncome=TaxCalculator.calculateTaxedIncome(income, taxDeductibleExpenses);
         double advanceTax=TaxCalculator.calculateAdvanceTax(income);
         double netIncome=TaxCalculator.calculateNetIncome(income,socialSecurityTax,healthSocialSecurityTax,sicknessSocialSecurityTax,healthTaxes[0],advanceTax);
 
