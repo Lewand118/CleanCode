@@ -14,26 +14,26 @@ public class TaxPrinter {
     public Double askForIncome() {
         System.out.print("Enter income: ");
 		try{
-        return Double.parseDouble(bufferedReader.readLine());
-    }
-    catch (Exception ex) {
-        System.out.println("Incorrect income");
-        System.err.println(ex);
-        System.exit(0);
-        return -1.0;
-    }
+            return Double.parseDouble(bufferedReader.readLine());
+        }
+        catch (Exception ex) {
+            System.out.println("Incorrect income");
+            System.err.println(ex);
+            System.exit(0);
+            return -1.0;
+        }
     }
 
     public char askForContract() {
         System.out.print("Contract Type: (E)mployment, (C)ivil: ");
 		try{
-        return bufferedReader.readLine().charAt(0);
+            return bufferedReader.readLine().charAt(0);
         }
         catch (Exception ex) {
             System.out.println("Incorrect contract type");
             System.err.println(ex);
             System.exit(0);
-            return 'x';
+            return ;
         }
 
     }
@@ -90,5 +90,3 @@ public class TaxPrinter {
         return bd.doubleValue();
     }
 }
-
-
