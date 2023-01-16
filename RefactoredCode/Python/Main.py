@@ -1,11 +1,11 @@
-from TaxCalculator import TaxCalculator
+from RefactoredCode.Python.UserInterface import UserInterface
 
 
 def main():
-    tax_calc = TaxCalculator()
+    user_interface = UserInterface()
 
-    tax_calc.get_input()
-    tax_calc.print_all_taxes()
+    user_interface.read_user_data()
+    user_interface.print_user_taxes()
 
 
 if __name__ == '__main__':
